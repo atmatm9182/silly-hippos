@@ -23,13 +23,13 @@ type PlayerState struct {
 
 type PlayerId = int32
 
-type HippoServer struct {
-	WorldState   common.World
-	Players      [MaxPlayers]PlayerState
-	PlayersCount int32
-}
+var (
+	worldState common.World
+	players      [MaxPlayers]PlayerState
+	playersCount int32
+)
 
-func (hs *HippoServer) Start(port int) {
+func StartHippoServer(port int) {
 	addr := fmt.Sprintf("localhost:%d", port)
 	listener, err := net.Listen("tcp", addr)
 
@@ -49,7 +49,7 @@ func (hs *HippoServer) Start(port int) {
 
 		log.Printf("Got a new connection: %s", conn)
 
-		if hs.PlayersCount >= MaxPlayers {
+		if playersCount >= MaxPlayers {
 			// TODO: send an error message
 			log.Fatalln("Player limit exceeded")
 		}
@@ -60,31 +60,31 @@ func (hs *HippoServer) Start(port int) {
 			log.Fatalln(err)
 		}
 
-		hs.Players[hs.PlayersCount] = PlayerState{
+		players[playersCount] = PlayerState{
 			Conn: conn,
 			Hippo: common.Hippo{
 				Position: common.Vector2[float32]{0.0, 0.0},
-				Name: lemmeIn.Name,
+				Name:     lemmeIn.Name,
 			},
 		}
-		hs.PlayersCount++
+		playersCount++
 
-		hs.SendDiscover(hs.PlayersCount - 1)
+		SendDiscover(playersCount - 1)
 
-		go hs.HandleConnection(hs.PlayersCount - 1)
+		go HandleConnection(playersCount - 1)
 	}
 }
 
 // TODO: lock the world's state mutex
-func (hs *HippoServer) CreateDiscoverMessage(id PlayerId) message.Discover {
-	hippos := make([]*types.Hippo, 0, hs.PlayersCount)
+func CreateDiscoverMessage(id PlayerId) message.Discover {
+	hippos := make([]*types.Hippo, 0, playersCount)
 
-	for i := int32(0); i < hs.PlayersCount; i++ {
+	for i := int32(0); i < playersCount; i++ {
 		if i == id {
 			continue
 		}
 
-		p := &hs.Players[i]
+		p := &players[i]
 		p.Mutex.Lock()
 
 		pos := new(types.Vector2)
@@ -104,12 +104,12 @@ func (hs *HippoServer) CreateDiscoverMessage(id PlayerId) message.Discover {
 	}
 }
 
-func (hs *HippoServer) SendDiscover(id PlayerId) {
-	p := &hs.Players[id]
+func SendDiscover(id PlayerId) {
+	p := &players[id]
 	p.Mutex.Lock()
 	defer p.Mutex.Unlock()
 
-	discover := hs.CreateDiscoverMessage(id)
+	discover := CreateDiscoverMessage(id)
 	fmt.Printf("Created a discover message for player %d: %+v\n", id, discover)
 
 	err := common.WriteMessage(p.Conn, &discover)
@@ -118,8 +118,8 @@ func (hs *HippoServer) SendDiscover(id PlayerId) {
 	}
 }
 
-func (hs *HippoServer) HandleConnection(id PlayerId) {
-	p := &hs.Players[id]
+func HandleConnection(id PlayerId) {
+	p := &players[id]
 
 	for {
 		var msg message.Message
@@ -131,22 +131,22 @@ func (hs *HippoServer) HandleConnection(id PlayerId) {
 		log.Printf("Got a new message from player %d: %+v\n", id, &msg)
 		os.Exit(1)
 
-		hs.HandleMessage(&msg)
+		HandleMessage(&msg)
 	}
 }
 
-func (hs *HippoServer) HandleMessage(msg *message.Message) {
+func HandleMessage(msg *message.Message) {
 	if moved := msg.GetMoved(); moved != nil {
-		hs.UpdateHippoMoved(msg.Id, moved.Where)
+		UpdateHippoMoved(msg.Id, moved.Where)
 
-		hs.NotifyMoved(msg.Id, moved)
+		NotifyMoved(msg.Id, moved)
 		return
 	}
 }
 
-func (hs *HippoServer) NotifyMoved(sender PlayerId, moved *message.Moved) {
-	for i := range hs.Players {
-		p := &hs.Players[i]
+func NotifyMoved(sender PlayerId, moved *message.Moved) {
+	for i := range players {
+		p := &players[i]
 
 		if int32(i) == sender {
 			continue
@@ -160,8 +160,8 @@ func (hs *HippoServer) NotifyMoved(sender PlayerId, moved *message.Moved) {
 	}
 }
 
-func (hs *HippoServer) UpdateHippoMoved(id PlayerId, where message.MoveDirection) {
-	p := &hs.Players[id]
+func  UpdateHippoMoved(id PlayerId, where message.MoveDirection) {
+	p := &players[id]
 	p.Mutex.Lock()
 	defer p.Mutex.Unlock()
 
@@ -178,4 +178,3 @@ func (hs *HippoServer) UpdateHippoMoved(id PlayerId, where message.MoveDirection
 		h.Position.X += 1.0
 	}
 }
-

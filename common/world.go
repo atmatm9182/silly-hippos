@@ -10,6 +10,6 @@ const (
 )
 
 type World struct {
-	TilePositions []Vector2[float32]
+	Hippos    []Hippo
 	TileTypes []TileType
 }

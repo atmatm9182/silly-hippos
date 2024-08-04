@@ -13,10 +13,6 @@ const windowWidth = 800
 const windowHeight = 600
 
 var world = common.World{
-	TilePositions: []common.Vector2[float32]{
-		{0.3, 0.5},
-		{0.5, 0.5},
-	},
 	TileTypes: []common.TileType{
 		common.GrassTile,
 		common.GrassTile,
@@ -29,15 +25,21 @@ func Vec2ToScreen(v common.Vector2[float32]) rl.Vector2 {
 	return rl.Vector2{X: v.X * float32(windowWidth), Y: v.Y * float32(windowHeight)}
 }
 
-func DrawTile(pos common.Vector2[float32], ty common.TileType) {
+func TilePosFromIdx(idx int) rl.Vector2 {
+	return rl.Vector2{
+		X: float32(idx % common.WorldWidth),
+		Y: float32(idx / common.WorldHeight),
+	}
+}
+
+func DrawTile(idx int, ty common.TileType) {
 	tex := tileTextures[ty]
-	rl.DrawTextureEx(tex, Vec2ToScreen(pos), 0, 0.1, rl.Red)
+	rl.DrawTextureEx(tex, TilePosFromIdx(idx), 0, 0.1, rl.Red)
 }
 
 func DrawWorld(world common.World) {
-	for i, pos := range world.TilePositions {
-		ty := world.TileTypes[i]
-		DrawTile(pos, ty)
+	for i, ty := range world.TileTypes {
+		DrawTile(i, ty)
 	}
 }
 
@@ -141,4 +143,3 @@ func UpdateWorld() {
 	DispatchPlayerEvents()
 	DispatchServerMessages()
 }
-

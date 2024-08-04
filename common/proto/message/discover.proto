@@ -4,7 +4,9 @@ package message;
 option go_package = "github.com/atmatm9182/silly-hippos/common/message";
 
 import "types/hippo.proto";
+import "types/tile-type.proto";
 
 message Discover {
     repeated types.Hippo hippos = 1;
+    repeated types.TileType tile_types = 2;
 }
