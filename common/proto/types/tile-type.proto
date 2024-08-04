@@ -1,0 +1,10 @@
+syntax = "proto3";
+package types;
+
+option go_package = "github.com/atmatm9182/silly-hippos/common/types";
+
+enum TileType {
+    GRASS = 0;
+    PLAIN = 1;
+    DIRT = 2;
+}
