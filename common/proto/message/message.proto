@@ -1,0 +1,15 @@
+syntax = "proto3";
+package message;
+
+option go_package = "github.com/atmatm9182/silly-hippos/common/message";
+
+import "message/moved.proto";
+import "message/arrived.proto";
+
+message Message {
+    int32 id = 1;
+    oneof MessageUnion {
+        Moved moved = 2;
+        Arrived arrived = 3;
+    }
+}

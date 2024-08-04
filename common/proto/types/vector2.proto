@@ -1,0 +1,9 @@
+syntax = "proto3";
+package types;
+
+option go_package = "github.com/atmatm9182/silly-hippos/common/types";
+
+message Vector2 {
+    float x = 1;
+    float y = 2;
+}

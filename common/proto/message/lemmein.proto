@@ -1,0 +1,8 @@
+syntax = "proto3";
+package message;
+
+option go_package = "github.com/atmatm9182/silly-hippos/common/message";
+
+message LemmeIn {
+    string name = 1;
+}

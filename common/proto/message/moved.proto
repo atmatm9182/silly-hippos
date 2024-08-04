@@ -1,0 +1,15 @@
+syntax = "proto3";
+package message;
+
+option go_package = "github.com/atmatm9182/silly-hippos/common/message";
+
+message Moved {
+    MoveDirection where = 1;
+}
+
+enum MoveDirection {
+    UP = 0;
+    DOWN = 1;
+    LEFT = 2;
+    RIGHT = 3;
+}
