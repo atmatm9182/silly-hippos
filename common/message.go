@@ -12,7 +12,6 @@ func ReadMessage(r io.Reader, msg proto.Message) error {
 	var msgLenBytes [4]byte
 	n, err := io.ReadFull(r, msgLenBytes[:])
 	if err != nil {
-		fmt.Printf("ERROR AT READING FULL: %s\n", err)
 		return err
 	}
 
