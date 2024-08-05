@@ -1,7 +1,6 @@
-package main
+package hwg
 
 import (
-	"fmt"
 	"math"
 )
 
@@ -56,12 +55,4 @@ func grad(hash int, x, y float64) float64 {
 	}
 
 	return x - y
-}
-
-func main() {
-	for x := 0; x < 10000; x++ {
-		for y := 0; y < 10000; y++ {
-			fmt.Println(perlinNoise(float64(x) / 0.7, float64(y) / 0.3))
-		}
-	}
 }
