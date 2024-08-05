@@ -7,4 +7,6 @@ enum Tile {
     GRASS = 0;
     PLAIN = 1;
     DIRT = 2;
+    WATER = 3;
+    MOUNTAIN = 4;
 }

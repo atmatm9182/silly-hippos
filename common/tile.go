@@ -6,5 +6,7 @@ const (
 	GrassTile Tile = iota
 	PlainTile
 	DirtTile
+	WaterTile
+	MountainTile
 	TileCount
 )

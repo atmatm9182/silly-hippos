@@ -19,6 +19,13 @@ func AssertEq[T comparable](t *testing.T, lhs, rhs T) {
 	}
 }
 
+var numOfTileTests = 0
+
+func AssertTilesEq(t *testing.T, lhs common.Tile, rhs types.Tile) {
+	AssertEq(t, int32(lhs), int32(rhs))
+	numOfTileTests++
+}
+
 func TestTileSize(t *testing.T) {
 	AssertEq(t, sizeof[common.Tile](), sizeof[types.Tile]())
 }
@@ -28,7 +35,11 @@ func TestTileCount(t *testing.T) {
 }
 
 func TestTileValues(t *testing.T) {
-	AssertEq(t, int32(common.GrassTile), int32(types.Tile_GRASS))
-	AssertEq(t, int32(common.PlainTile), int32(types.Tile_PLAIN))
-	AssertEq(t, int32(common.DirtTile), int32(types.Tile_DIRT))
+	AssertTilesEq(t, common.GrassTile, types.Tile_GRASS)
+	AssertTilesEq(t, common.PlainTile, types.Tile_PLAIN)
+	AssertTilesEq(t, common.DirtTile, types.Tile_DIRT)
+	AssertTilesEq(t, common.WaterTile, types.Tile_WATER)
+	AssertTilesEq(t, common.MountainTile, types.Tile_MOUNTAIN)
+
+	AssertEq(t, numOfTileTests, int(common.TileCount))
 }
