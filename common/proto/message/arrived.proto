@@ -6,5 +6,6 @@ option go_package = "github.com/atmatm9182/silly-hippos/common/message";
 import "types/hippo.proto";
 
 message Arrived {
-    types.Hippo hippo = 1;
+    int32 id = 1;
+    types.Hippo hippo = 2;
 }

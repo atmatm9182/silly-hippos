@@ -1,6 +1,6 @@
 package common
 
 type Hippo struct {
-	Position Vector2[float32]
 	Name string
+	Pos Vector2[float32]
 }

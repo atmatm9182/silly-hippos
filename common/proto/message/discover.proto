@@ -3,10 +3,10 @@ package message;
 
 option go_package = "github.com/atmatm9182/silly-hippos/common/message";
 
-import "types/hippo.proto";
-import "types/tile-type.proto";
+import "types/world-state.proto";
 
 message Discover {
-    repeated types.Hippo hippos = 1;
-    repeated types.TileType tile_types = 2;
+    int32 your_id = 1;
+    types.WorldState world_state = 2;
+    repeated int32 hippo_ids = 3;
 }

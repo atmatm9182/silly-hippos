@@ -3,7 +3,7 @@ package types;
 
 option go_package = "github.com/atmatm9182/silly-hippos/common/types";
 
-enum TileType {
+enum Tile {
     GRASS = 0;
     PLAIN = 1;
     DIRT = 2;

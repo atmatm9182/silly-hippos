@@ -12,8 +12,8 @@ import (
 const windowWidth = 800
 const windowHeight = 600
 
-var world = common.World{
-	TileTypes: []common.TileType{
+var world = common.WorldState{
+	Tiles: []common.Tile{
 		common.GrassTile,
 		common.GrassTile,
 	},
@@ -32,13 +32,13 @@ func TilePosFromIdx(idx int) rl.Vector2 {
 	}
 }
 
-func DrawTile(idx int, ty common.TileType) {
+func DrawTile(idx int, ty common.Tile) {
 	tex := tileTextures[ty]
 	rl.DrawTextureEx(tex, TilePosFromIdx(idx), 0, 0.1, rl.Red)
 }
 
-func DrawWorld(world common.World) {
-	for i, ty := range world.TileTypes {
+func DrawWorld(world common.WorldState) {
+	for i, ty := range world.Tiles {
 		DrawTile(i, ty)
 	}
 }
@@ -95,6 +95,11 @@ func ConnectToTheServer(addr string) {
 	err = common.ReadMessage(conn, &discover)
 	if err != nil {
 		log.Fatalln(err)
+	}
+
+	worldSize := common.WorldHeight * common.WorldWidth
+	if len(discover.WorldState.Tiles) != worldSize {
+		log.Fatalf("Expected to get %d tiles, got %d\n", worldSize, len(discover.WorldState.Tiles))
 	}
 
 	log.Printf("Got the discover message: %+v\n", discover)

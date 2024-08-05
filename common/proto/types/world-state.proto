@@ -1,0 +1,12 @@
+syntax = "proto3";
+package types;
+
+option go_package = "github.com/atmatm9182/silly-hippos/common/types";
+
+import "types/hippo.proto";
+import "types/tile.proto";
+
+message WorldState {
+    repeated types.Hippo hippos = 1;
+    repeated types.Tile tiles = 2;
+}

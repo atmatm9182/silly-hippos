@@ -24,7 +24,7 @@ type PlayerState struct {
 type PlayerId = int32
 
 var (
-	worldState common.World
+	worldState   common.WorldState
 	players      [MaxPlayers]PlayerState
 	playersCount int32
 )
@@ -63,8 +63,8 @@ func StartHippoServer(port int) {
 		players[playersCount] = PlayerState{
 			Conn: conn,
 			Hippo: common.Hippo{
-				Position: common.Vector2[float32]{0.0, 0.0},
-				Name:     lemmeIn.Name,
+				Pos:  common.Vector2[float32]{0.0, 0.0},
+				Name: lemmeIn.Name,
 			},
 		}
 		playersCount++
@@ -88,10 +88,9 @@ func CreateDiscoverMessage(id PlayerId) message.Discover {
 		p.Mutex.Lock()
 
 		pos := new(types.Vector2)
-		*pos = common.Vector2ToProto(p.Hippo.Position)
+		*pos = common.Vector2ToProto(p.Hippo.Pos)
 
 		hippos = append(hippos, &types.Hippo{
-			Id:   i,
 			Name: p.Hippo.Name,
 			Pos:  pos,
 		})
@@ -100,7 +99,7 @@ func CreateDiscoverMessage(id PlayerId) message.Discover {
 	}
 
 	return message.Discover{
-		Hippos: hippos,
+		WorldState: worldState.ToProto(),
 	}
 }
 
@@ -160,7 +159,7 @@ func NotifyMoved(sender PlayerId, moved *message.Moved) {
 	}
 }
 
-func  UpdateHippoMoved(id PlayerId, where message.MoveDirection) {
+func UpdateHippoMoved(id PlayerId, where message.MoveDirection) {
 	p := &players[id]
 	p.Mutex.Lock()
 	defer p.Mutex.Unlock()
@@ -169,12 +168,12 @@ func  UpdateHippoMoved(id PlayerId, where message.MoveDirection) {
 
 	switch where {
 	case message.MoveDirection_UP:
-		h.Position.Y += 1.0
+		h.Pos.Y += 1.0
 	case message.MoveDirection_DOWN:
-		h.Position.Y -= 1.0
+		h.Pos.Y -= 1.0
 	case message.MoveDirection_LEFT:
-		h.Position.X -= 1.0
+		h.Pos.X -= 1.0
 	case message.MoveDirection_RIGHT:
-		h.Position.X += 1.0
+		h.Pos.X += 1.0
 	}
 }

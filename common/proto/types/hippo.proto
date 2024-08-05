@@ -6,7 +6,6 @@ option go_package = "github.com/atmatm9182/silly-hippos/common/types";
 import "types/vector2.proto";
 
 message Hippo {
-    int32 id = 1;
-    string name = 2;
-    Vector2 pos = 3;
+    string name = 1;
+    Vector2 pos = 2;
 }
