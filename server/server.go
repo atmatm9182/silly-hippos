@@ -18,7 +18,7 @@ const MaxPlayers = 8
 type PlayerState struct {
 	Conn  net.Conn
 	Hippo common.Hippo
-	Mutex sync.Mutex
+	Mutex sync.RWMutex
 }
 
 type PlayerId = int32
@@ -85,7 +85,7 @@ func CreateDiscoverMessage(id PlayerId) message.Discover {
 		}
 
 		p := &players[i]
-		p.Mutex.Lock()
+		p.Mutex.RLock()
 
 		pos := new(types.Vector2)
 		*pos = common.Vector2ToProto(p.Hippo.Pos)
@@ -95,7 +95,7 @@ func CreateDiscoverMessage(id PlayerId) message.Discover {
 			Pos:  pos,
 		})
 
-		p.Mutex.Unlock()
+		p.Mutex.RUnlock()
 	}
 
 	return message.Discover{
@@ -105,8 +105,6 @@ func CreateDiscoverMessage(id PlayerId) message.Discover {
 
 func SendDiscover(id PlayerId) {
 	p := &players[id]
-	p.Mutex.Lock()
-	defer p.Mutex.Unlock()
 
 	discover := CreateDiscoverMessage(id)
 	fmt.Printf("Created a discover message for player %d: %+v\n", id, discover)
