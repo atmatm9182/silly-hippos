@@ -41,9 +41,9 @@ func (p PlayerMovedEvent) ToMessage() proto.Message {
 func (p PlayerMovedEvent) Apply(h *common.Hippo) {
 	switch p {
 	case PlayerMovedUp:
-		h.Pos.Y++
-	case PlayerMovedDown:
 		h.Pos.Y--
+	case PlayerMovedDown:
+		h.Pos.Y++
 	case PlayerMovedLeft:
 		h.Pos.X--
 	case PlayerMovedRight:

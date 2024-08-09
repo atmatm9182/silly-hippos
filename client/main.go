@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"os"
 
 	rl "github.com/gen2brain/raylib-go/raylib"
@@ -35,7 +34,6 @@ func main() {
 		UpdateWorld()
 
 		camera.Target = Vector2ToRl(me.Pos.AddScalar(0.5).MulScalar(tileSize))
-		log.Printf("%+v\n", camera)
 
 		rl.BeginMode2D(camera)
 		DrawWorld(world)
