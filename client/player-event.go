@@ -1,12 +1,14 @@
 package main
 
 import (
+	"github.com/atmatm9182/silly-hippos/common"
 	"github.com/atmatm9182/silly-hippos/common/message"
 	"google.golang.org/protobuf/proto"
 )
 
 type PlayerEvent interface {
 	ToMessage() proto.Message
+	Apply(h *common.Hippo)
 }
 
 type PlayerMovedEvent uint8
@@ -36,3 +38,15 @@ func (p PlayerMovedEvent) ToMessage() proto.Message {
 	}
 }
 
+func (p PlayerMovedEvent) Apply(h *common.Hippo) {
+	switch p {
+	case PlayerMovedUp:
+		h.Pos.Y++
+	case PlayerMovedDown:
+		h.Pos.Y--
+	case PlayerMovedLeft:
+		h.Pos.X--
+	case PlayerMovedRight:
+		h.Pos.X++
+	}
+}

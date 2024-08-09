@@ -10,17 +10,16 @@ type WorldState struct {
 	Tiles  []Tile
 }
 
+func (ws *WorldState) GetTileAt(x, y int) Tile {
+	idx := y * WorldWidth + x
+	return ws.Tiles[idx]
+}
+
 func (ws *WorldState) ToProto() *types.WorldState {
 	hippos := make([]*types.Hippo, len(ws.Hippos))
 
 	for _, h := range ws.Hippos {
-		pos := new(types.Vector2)
-		*pos = Vector2ToProto(h.Pos)
-
-		hippos = append(hippos, &types.Hippo{
-			Pos:  pos,
-			Name: h.Name,
-		})
+		hippos = append(hippos, h.ToProto())
 	}
 
 	// Do this to avoid allocating a new slice.
@@ -29,6 +28,21 @@ func (ws *WorldState) ToProto() *types.WorldState {
 	tiles := unsafe.Slice(tilePtr, len(ws.Tiles))
 
 	return &types.WorldState{
+		Hippos: hippos,
+		Tiles:  tiles,
+	}
+}
+
+func WorldStateFromProto(state *types.WorldState) WorldState {
+	hippos := make([]Hippo, 0, len(state.Hippos))
+	for _, h := range state.Hippos {
+		hippos = append(hippos, HippoFromProto(h))
+	}
+
+	tilePtr := (*Tile)(unsafe.Pointer(unsafe.SliceData(state.Tiles)))
+	tiles := unsafe.Slice(tilePtr, len(state.Tiles))
+
+	return WorldState{
 		Hippos: hippos,
 		Tiles:  tiles,
 	}

@@ -12,16 +12,19 @@ import (
 const windowWidth = 800
 const windowHeight = 600
 
-var world = common.WorldState{
-	Tiles: []common.Tile{
-		common.GrassTile,
-		common.GrassTile,
-	},
-}
+const tileSize float32 = 64.0
 
-var tileTextures = [common.TileCount]rl.Texture2D{}
+var (
+	tileTexture rl.Texture2D
+	camera      rl.Camera2D
+)
 
-func Vec2ToScreen(v common.Vector2[float32]) rl.Vector2 {
+var (
+	world common.WorldState
+	me    common.Hippo
+)
+
+func Vec2ToScreen(v common.Vector2) rl.Vector2 {
 	return rl.Vector2{X: v.X * float32(windowWidth), Y: v.Y * float32(windowHeight)}
 }
 
@@ -32,22 +35,60 @@ func TilePosFromIdx(idx int) rl.Vector2 {
 	}
 }
 
-func DrawTile(idx int, ty common.Tile) {
-	tex := tileTextures[ty]
-	rl.DrawTextureEx(tex, TilePosFromIdx(idx), 0, 0.1, rl.Red)
+func GetTileRect(tile common.Tile) rl.Rectangle {
+	return rl.Rectangle{
+		X:      0,
+		Y:      0,
+		Width:  tileSize,
+		Height: tileSize,
+	}
+}
+
+func DrawTile(at rl.Vector2, tile common.Tile) {
+	rl.DrawTextureRec(tileTexture, GetTileRect(tile), at, rl.White)
 }
 
 func DrawWorld(world common.WorldState) {
-	for i, ty := range world.Tiles {
-		DrawTile(i, ty)
+	xc := windowWidth/tileSize / 2
+	yc := windowHeight/tileSize / 2
+
+	xcc := xc + 1
+	ycc := yc + 1
+
+	for x := -xcc; x < xcc; x++ {
+		for y := -ycc; y < ycc; y++ {
+			tileX := me.Pos.X + x
+			if tileX < 0 {
+				continue
+			}
+
+			tileY := me.Pos.Y + y
+			if tileY < 0 {
+				continue
+			}
+
+			tile := world.GetTileAt(int(tileX), int(tileY))
+
+			ax := tileX - xc //  + float32(xc)
+			ay := tileY - yc //  + float32(yc)
+
+			at := rl.Vector2{
+				X: ax * tileSize,
+				Y: ay * tileSize,
+			}
+
+			at = rl.Vector2Add(at, camera.Offset)
+
+			log.Println(ax, ay)
+
+			DrawTile(at, tile)
+		}
 	}
 }
 
 // this needs to be called AFTER the window has been initialized
 func LoadTextures() {
-	tileTextures[common.GrassTile] = rl.LoadTexture("./assets/grass-tile.png")
-	tileTextures[common.DirtTile] = rl.Texture2D{}
-	tileTextures[common.PlainTile] = rl.Texture2D{}
+	tileTexture = rl.LoadTexture("./assets/tile-texture.png")
 }
 
 var (
@@ -102,9 +143,26 @@ func ConnectToTheServer(addr string) {
 		log.Fatalf("Expected to get %d tiles, got %d\n", worldSize, len(discover.WorldState.Tiles))
 	}
 
-	log.Printf("Got the discover message: %+v\n", discover)
+	world = common.WorldStateFromProto(discover.WorldState)
+	me.Pos = common.Vector2FromProto(discover.YourPos)
+
+	camera = rl.NewCamera2D(
+		rl.Vector2{
+			X: windowWidth / 2,
+			Y: windowHeight / 2,
+		},
+		Vector2ToRl(me.Pos),
+		0,
+		1.0)
 
 	go ListenToServerMessages()
+}
+
+func Vector2ToRl(v common.Vector2) rl.Vector2 {
+	return rl.Vector2{
+		X: v.X,
+		Y: v.Y,
+	}
 }
 
 func CollectEvents() {
@@ -127,6 +185,7 @@ func DispatchPlayerEvents() {
 		select {
 		case e := <-playerEvents:
 			log.Printf("Dispatching player event %+v\n", e)
+			e.Apply(&me)
 		default:
 			return
 		}

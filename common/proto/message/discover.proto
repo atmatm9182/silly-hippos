@@ -4,9 +4,11 @@ package message;
 option go_package = "github.com/atmatm9182/silly-hippos/common/message";
 
 import "types/world-state.proto";
+import "types/vector2.proto";
 
 message Discover {
     int32 your_id = 1;
-    types.WorldState world_state = 2;
-    repeated int32 hippo_ids = 3;
+    types.Vector2 your_pos = 2;
+    types.WorldState world_state = 3;
+    repeated int32 hippo_ids = 4;
 }

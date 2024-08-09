@@ -29,7 +29,9 @@ var (
 	playersCount int32
 )
 
-func StartHippoServer(port int) {
+func StartHippoServer(port int, worldTiles []common.Tile) {
+	worldState.Tiles = worldTiles
+
 	addr := fmt.Sprintf("localhost:%d", port)
 	listener, err := net.Listen("tcp", addr)
 
@@ -63,7 +65,7 @@ func StartHippoServer(port int) {
 		players[playersCount] = PlayerState{
 			Conn: conn,
 			Hippo: common.Hippo{
-				Pos:  common.Vector2[float32]{0.0, 0.0},
+				Pos:  common.Vector2{0.0, 0.0},
 				Name: lemmeIn.Name,
 			},
 		}
@@ -88,7 +90,7 @@ func CreateDiscoverMessage(id PlayerId) message.Discover {
 		p.Mutex.RLock()
 
 		pos := new(types.Vector2)
-		*pos = common.Vector2ToProto(p.Hippo.Pos)
+		pos = p.Hippo.Pos.ToProto()
 
 		hippos = append(hippos, &types.Hippo{
 			Name: p.Hippo.Name,
@@ -99,6 +101,8 @@ func CreateDiscoverMessage(id PlayerId) message.Discover {
 	}
 
 	return message.Discover{
+		YourId:     id,
+		YourPos:    &types.Vector2{X: 0.0, Y: 0.0},
 		WorldState: worldState.ToProto(),
 	}
 }
@@ -107,7 +111,6 @@ func SendDiscover(id PlayerId) {
 	p := &players[id]
 
 	discover := CreateDiscoverMessage(id)
-	fmt.Printf("Created a discover message for player %d: %+v\n", id, discover)
 
 	err := common.WriteMessage(p.Conn, &discover)
 	if err != nil {

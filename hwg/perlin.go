@@ -20,7 +20,7 @@ var perm = [257]int{
 	254, 138, 236, 205, 93, 222, 114, 67, 29, 24, 72, 243, 141, 128, 195, 78, 66, 215, 61, 156, 151, 1,
 }
 
-func perlinNoise(x, y float64) float64 {
+func PerlinNoise(x, y float64) float64 {
 	fx := int(math.Floor(x))
 	fy := int(math.Floor(y))
 
