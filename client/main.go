@@ -33,6 +33,7 @@ func main() {
 		CollectEvents()
 		UpdateWorld()
 
+		// Add 0.5 so the hippo appears in the center of the screen
 		camera.Target = Vector2ToRl(me.Pos.AddScalar(0.5).MulScalar(tileSize))
 
 		rl.BeginMode2D(camera)

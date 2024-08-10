@@ -232,7 +232,7 @@ func FuzzPerlinNoise(f *testing.F) {
 		by := binary.NativeEndian.Uint64(a[8:])
 		y := math.Float64frombits(by)
 
-		noise := perlinNoise(x, y)
+		noise := PerlinNoise(x, y)
 		if noise < -1 || noise > 1 {
 			t.Errorf("Expected the noise to be in range [-1, -1], but got %f", noise)
 		}

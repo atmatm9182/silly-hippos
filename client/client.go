@@ -37,7 +37,7 @@ func TilePosFromIdx(idx int) rl.Vector2 {
 
 func GetTileRect(tile common.Tile) rl.Rectangle {
 	return rl.Rectangle{
-		X:      0,
+		X:      float32(tile) * tileSize,
 		Y:      0,
 		Width:  tileSize,
 		Height: tileSize,
@@ -49,8 +49,8 @@ func DrawTile(at rl.Vector2, tile common.Tile) {
 }
 
 func DrawWorld(world common.WorldState) {
-	xc := windowWidth/tileSize / 2
-	yc := windowHeight/tileSize / 2
+	xc := windowWidth / tileSize / 2
+	yc := windowHeight / tileSize / 2
 
 	xcc := xc + 1
 	ycc := yc + 1
