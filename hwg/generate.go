@@ -1,7 +1,6 @@
 package hwg
 
 import (
-	// "crypto/sha256"
 	"encoding/binary"
 	"math"
 	"math/rand"
