@@ -3,6 +3,7 @@ package hwg
 import (
 	// "crypto/sha256"
 	"encoding/binary"
+	"math"
 	"math/rand"
 
 	"github.com/atmatm9182/silly-hippos/common"
@@ -26,6 +27,9 @@ func GenerateHippoWorld(seed [32]byte, params GenerationParams) []common.Tile {
 	r := rand.New(rand.NewSource(int64(s)))
 
 	g := r.Float64()
+	for g == 0 {
+		g = r.Float64()
+	}
 
 	tiles := make([]common.Tile, 0, params.Width*params.Height)
 	for x := 0; x < params.Width; x++ {
@@ -40,13 +44,8 @@ func GenerateHippoWorld(seed [32]byte, params GenerationParams) []common.Tile {
 }
 
 func getTileBasedOnNoise(noise float64) common.Tile {
-	if noise < -0.3 {
-		return common.WaterTile
-	}
-
-	if noise > 0.3 {
-		return common.MountainTile
-	}
-
-	return common.GrassTile
+	noise = noise/2 + 0.5
+	h := float64(common.TileCount - 1)
+	v := math.Round(lerp(noise, 0, h))
+	return common.Tile(v)
 }
